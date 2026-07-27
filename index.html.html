@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mamalo's Family Recipes</title>
+  <style>
+    :root {
+      --cream: #fdf6e9;
+      --warm-white: #fffaf3;
+      --terracotta: #c45c26;
+      --terracotta-dark: #a34a1e;
+      --sage: #6b8f71;
+      --sage-dark: #55735a;
+      --ink: #3d2c1e;
+      --muted: #7a6a5a;
+      --card-shadow: 0 4px 20px rgba(61, 44, 30, 0.08);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--terracotta) 0%, #d4784a 100%);
+      color: white;
+      padding: 1.75rem 1.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(196, 92, 38, 0.25);
+    }
+
+    header h1 {
+      font-size: clamp(1.75rem, 5vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    header p {
+      opacity: 0.92;
+      font-size: 1.05rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* Layout */
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 0.7rem 1rem 0.7rem 2.5rem;
+      border: 2px solid #e8d9c8;
+      border-radius: 999px;
+      background: var(--warm-white);
+      font-size: 1rem;
+      color: var(--ink);
+      transition: border-color 0.2s;
+    }
+
+    .search-wrap input:focus {
+      outline: none;
+      border-color: var(--terracotta);
+    }
+
+    .search-wrap::before {
+      content: "⌕";
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 1.1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.7rem 1.25rem;
+      border: none;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: var(--terracotta);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--terracotta-dark);
+    }
+
+    .btn-secondary {
+      background: var(--sage);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: var(--sage-dark);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 2px solid #e0d0c0;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--muted);
+      color: var(--ink);
+    }
+
+    .btn-danger {
+      background: #c44;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #a33;
+    }
+
+    /* Recipe cards */
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .recipe-card {
+      background: var(--warm-white);
+      border-radius: var(--radius);
+      padding: 1.35rem;
+      box-shadow: var(--card-shadow);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid #f0e4d4;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .recipe-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(61, 44, 30, 0.12);
+    }
+
+    .recipe-card h3 {
+      font-size: 1.2rem;
+      color: var(--terracotta);
+      line-height: 1.3;
+    }
+
+    .recipe-card .meta {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .recipe-card .preview {
+      font-size: 0.92rem;
+      color: var(--ink);
+      opacity: 0.85;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex-grow: 1;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .empty-state p {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(61, 44, 30, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s, visibility 0.25s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--warm-white);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      transform: translateY(12px);
+      transition: transform 0.25s;
+    }
+
+    .modal-overlay.open .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 1.4rem 1.5rem 0.5rem;
+      gap: 1rem;
+    }
+
+    .modal-header h2 {
+      font-size: 1.45rem;
+      color: var(--terracotta);
+      line-height: 1.3;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.6rem;
+      color: var(--muted);
+      cursor: pointer;
+      line-height: 1;
+      padding: 0.2rem;
+    }
+
+    .modal-close:hover {
+      color: var(--ink);
+    }
+
+    .modal-body {
+      padding: 0.75rem 1.5rem 1.5rem;
+    }
+
+    .detail-meta {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--sage);
+      font-weight: 700;
+      margin: 1.25rem 0 0.5rem;
+    }
+
+    .ingredients-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .ingredients-list li {
+      padding: 0.35rem 0 0.35rem 1.4rem;
+      position: relative;
+      border-bottom: 1px solid #f0e4d4;
+    }
+
+    .ingredients-list li:last-child {
+      border-bottom: none;
+    }
+
+    .ingredients-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0.35rem;
+      color: var(--terracotta);
+      font-weight: bold;
+    }
+
+    .instructions {
+      white-space: pre-wrap;
+      font-size: 0.98rem;
+    }
+
+    .notes {
+      background: #f8efe3;
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      font-size: 0.95rem;
+      margin-top: 0.5rem;
+      border-left: 4px solid var(--sage);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #efe4d4;
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      color: var(--ink);
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border: 2px solid #e8d9c8;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: white;
+      color: var(--ink);
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--terracotta);
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-group textarea.tall {
+      min-height: 140px;
+    }
+
+    .form-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--ink);
+      color: white;
+      padding: 0.75rem 1.4rem;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      z-index: 200;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mamalo's Family Recipes</h1>
+    <p>Treasured dishes from the kitchen, shared with love for family & friends</p>
+  </header>
+
+  <div class="container">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <input type="search" id="searchInput" placeholder="Search recipes..." autocomplete="off" />
+      </div>
+      <button class="btn btn-primary" id="addBtn">+ Add Recipe</button>
+    </div>
+
+    <div id="recipeGrid" class="recipe-grid"></div>
+    <div id="emptyState" class="empty-state" hidden>
+      <p>No recipes yet. Be the first to add one!</p>
+      <button class="btn btn-primary" id="emptyAddBtn">+ Add Recipe</button>
+    </div>
+  </div>
+
+  <footer>
+    Recipes stay on this device · Share this page so everyone can contribute
+  </footer>
+
+  <!-- View Recipe Modal -->
+  <div class="modal-overlay" id="viewModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="viewTitle"></h2>
+        <button class="modal-close" id="viewClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-meta" id="viewMeta"></div>
+        <div class="section-label">Ingredients</div>
+        <ul class="ingredients-list" id="viewIngredients"></ul>
+        <div class="section-label">Instructions</div>
+        <div class="instructions" id="viewInstructions"></div>
+        <div id="viewNotesWrap" hidden>
+          <div class="section-label">Notes</div>
+          <div class="notes" id="viewNotes"></div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="viewCloseBtn">Close</button>
+          <button class="btn btn-danger" id="deleteBtn">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit Recipe Modal -->
+  <div class="modal-overlay" id="formModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="formTitle">Add a Recipe</h2>
+        <button class="modal-close" id="formClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="recipeForm">
+          <div class="form-group">
+            <label for="titleInput">Recipe Name *</label>
+            <input type="text" id="titleInput" required placeholder="e.g. Mamalo's Chicken Soup" />
+          </div>
+          <div class="form-group">
+            <label for="authorInput">Your Name *</label>
+            <input type="text" id="authorInput" required placeholder="Who is sharing this?" />
+          </div>
+          <div class="form-group">
+            <label for="ingredientsInput">Ingredients *</label>
+            <textarea id="ingredientsInput" class="tall" required placeholder="One ingredient per line&#10;2 cups flour&#10;1 tsp salt&#10;..."></textarea>
+            <p class="form-hint">Put each ingredient on its own line</p>
+          </div>
+          <div class="form-group">
+            <label for="instructionsInput">Instructions *</label>
+            <textarea id="instructionsInput" class="tall" required placeholder="Step-by-step directions..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="notesInput">Notes (optional)</label>
+            <textarea id="notesInput" placeholder="Tips, variations, or memories..."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="formCancel">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Recipe</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = "mamalos-family-recipes";
+
+    // Starter recipes so the page feels welcoming
+    const STARTER_RECIPES = [
+      {
+        id: "starter-1",
+        title: "Mamalo's Classic Chicken Soup",
+        author: "Mamalo",
+        ingredients: "1 whole chicken\n2 carrots, sliced\n2 celery stalks, chopped\n1 onion, diced\n3 garlic cloves\n8 cups water\nSalt & pepper to taste\nFresh parsley\n2 cups egg noodles (optional)",
+        instructions: "1. Place the chicken in a large pot with water, onion, and garlic. Bring to a boil, then simmer 1 hour.\n2. Remove chicken, shred the meat, and discard bones.\n3. Add carrots and celery to the broth. Simmer 20 minutes.\n4. Return shredded chicken to the pot. Season with salt and pepper.\n5. Add noodles if using and cook until tender.\n6. Finish with chopped parsley. Serve hot with love.",
+        notes: "The secret is a long, gentle simmer. Always taste and adjust the salt at the end.",
+        createdAt: Date.now() - 100000
+      },
+      {
+        id: "starter-2",
+        title: "Sunday Morning Pancakes",
+        author: "Mamalo",
+        ingredients: "2 cups all-purpose flour\n2 tbsp sugar\n2 tsp baking powder\n1/2 tsp salt\n2 eggs\n1 3/4 cups milk\n1/4 cup melted butter\n1 tsp vanilla",
+        instructions: "1. Whisk dry ingredients together in a large bowl.\n2. In another bowl, beat eggs, then stir in milk, melted butter, and vanilla.\n3. Pour wet into dry and stir just until combined (lumps are okay).\n4. Heat a lightly greased skillet over medium. Pour 1/4 cup batter per pancake.\n5. Flip when bubbles form and edges look set. Cook until golden.\n6. Serve stacked high with butter and maple syrup.",
+        notes: "For extra fluffy pancakes, let the batter rest 5 minutes before cooking.",
+        createdAt: Date.now() - 90000
+      },
+      {
+        id: "starter-3",
+        title: "Honey-Glazed Carrots",
+        author: "Mamalo",
+        ingredients: "1 lb carrots, peeled and sliced\n2 tbsp butter\n2 tbsp honey\n1/2 tsp salt\nPinch of black pepper\nFresh thyme (optional)",
+        instructions: "1. Steam or boil carrots until just tender, about 8–10 minutes. Drain well.\n2. In a skillet, melt butter over medium heat. Add honey and stir.\n3. Add carrots, salt, and pepper. Toss until coated and glazed, 3–4 minutes.\n4. Sprinkle with thyme if you like. Serve warm.",
+        notes: "Kids love these. A little extra honey never hurts.",
+        createdAt: Date.now() - 80000
+      }
+    ];
+
+    let recipes = [];
+    let currentViewId = null;
+
+    // DOM refs
+    const recipeGrid = document.getElementById("recipeGrid");
+    const emptyState = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const toast = document.getElementById("toast");
+
+    const viewModal = document.getElementById("viewModal");
+    const formModal = document.getElementById("formModal");
+    const recipeForm = document.getElementById("recipeForm");
+
+    // Load recipes
+    function loadRecipes() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          recipes = JSON.parse(raw);
+        } else {
+          recipes = [...STARTER_RECIPES];
+          saveRecipes();
+        }
+      } catch (e) {
+        recipes = [...STARTER_RECIPES];
+      }
+    }
+
+    function saveRecipes() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2500);
+    }
+
+    function renderRecipes(filter = "") {
+      const q = filter.trim().toLowerCase();
+      const filtered = recipes
+        .filter(r => {
+          if (!q) return true;
+          return (
+            r.title.toLowerCase().includes(q) ||
+            r.author.toLowerCase().includes(q) ||
+            r.ingredients.toLowerCase().includes(q)
+          );
+        })
+        .sort((a, b) => b.createdAt - a.createdAt);
+
+      recipeGrid.innerHTML = "";
+
+      if (filtered.length === 0) {
+        emptyState.hidden = false;
+        recipeGrid.hidden = true;
+        return;
+      }
+
+      emptyState.hidden = true;
+      recipeGrid.hidden = false;
+
+      filtered.forEach(r => {
+        const card = document.createElement("article");
+        card.className = "recipe-card";
+        card.innerHTML = `
+          <h3>${escapeHtml(r.title)}</h3>
+          <div class="meta">by ${escapeHtml(r.author)}</div>
+          <div class="preview">${escapeHtml(r.ingredients.split("\n")[0] || "")}…</div>
+        `;
+        card.addEventListener("click", () => openView(r.id));
+        recipeGrid.appendChild(card);
+      });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function openView(id) {
+      const r = recipes.find(x => x.id === id);
+      if (!r) return;
+      currentViewId = id;
+
+      document.getElementById("viewTitle").textContent = r.title;
+      document.getElementById("viewMeta").textContent = `Shared by ${r.author}`;
+
+      const list = document.getElementById("viewIngredients");
+      list.innerHTML = "";
+      r.ingredients.split("\n").filter(Boolean).forEach(line => {
+        const li = document.createElement("li");
+        li.textContent = line.trim();
+        list.appendChild(li);
+      });
+
+      document.getElementById("viewInstructions").textContent = r.instructions;
+
+      const notesWrap = document.getElementById("viewNotesWrap");
+      if (r.notes && r.notes.trim()) {
+        notesWrap.hidden = false;
+        document.getElementById("viewNotes").textContent = r.notes;
+      } else {
+        notesWrap.hidden = true;
+      }
+
+      viewModal.classList.add("open");
+    }
+
+    function closeView() {
+      viewModal.classList.remove("open");
+      currentViewId = null;
+    }
+
+    function openForm() {
+      recipeForm.reset();
+      document.getElementById("formTitle").textContent = "Add a Recipe";
+      formModal.classList.add("open");
+      document.getElementById("titleInput").focus();
+    }
+
+    function closeForm() {
+      formModal.classList.remove("open");
+    }
+
+    function deleteCurrent() {
+      if (!currentViewId) return;
+      if (!confirm("Delete this recipe? This cannot be undone on this device.")) return;
+      recipes = recipes.filter(r => r.id !== currentViewId);
+      saveRecipes();
+      closeView();
+      renderRecipes(searchInput.value);
+      showToast("Recipe deleted");
+    }
+
+    // Event listeners
+    document.getElementById("addBtn").addEventListener("click", openForm);
+    document.getElementById("emptyAddBtn").addEventListener("click", openForm);
+    document.getElementById("viewClose").addEventListener("click", closeView);
+    document.getElementById("viewCloseBtn").addEventListener("click", closeView);
+    document.getElementById("deleteBtn").addEventListener("click", deleteCurrent);
+    document.getElementById("formClose").addEventListener("click", closeForm);
+    document.getElementById("formCancel").addEventListener("click", closeForm);
+
+    viewModal.addEventListener("click", e => {
+      if (e.target === viewModal) closeView();
+    });
+    formModal.addEventListener("click", e => {
+      if (e.target === formModal) closeForm();
+    });
+
+    searchInput.addEventListener("input", () => renderRecipes(searchInput.value));
+
+    recipeForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const title = document.getElementById("titleInput").value.trim();
+      const author = document.getElementById("authorInput").value.trim();
+      const ingredients = document.getElementById("ingredientsInput").value.trim();
+      const instructions = document.getElementById("instructionsInput").value.trim();
+      const notes = document.getElementById("notesInput").value.trim();
+
+      if (!title || !author || !ingredients || !instructions) return;
+
+      const newRecipe = {
+        id: "r-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+        title,
+        author,
+        ingredients,
+        instructions,
+        notes,
+        createdAt: Date.now()
+      };
+
+      recipes.push(newRecipe);
+      saveRecipes();
+      closeForm();
+      searchInput.value = "";
+      renderRecipes();
+      showToast("Recipe added — thank you!");
+    });
+
+    // Keyboard: Escape closes modals
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") {
+        closeView();
+        closeForm();
+      }
+    });
+
+    // Init
+    loadRecipes();
+    renderRecipes();
+  </script>
+</body>
+</html>
