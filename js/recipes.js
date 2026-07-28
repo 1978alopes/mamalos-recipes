@@ -3,7 +3,7 @@
 import {
   state,
   canManageRecipes,
-  canDeleteRecipe
+  canModifyRecipe
 } from "./state.js";
 
 import {
