@@ -564,10 +564,7 @@ if (!state.editingRecipeId) {
 }
 
 export async function deleteCurrent() {
-  if (
-    !canManageRecipes() ||
-    !state.currentViewId
-  ) {
+  if (!state.currentViewId) {
     return;
   }
 
@@ -579,6 +576,14 @@ export async function deleteCurrent() {
     );
 
   if (!recipe) {
+    return;
+  }
+
+  if (!canDeleteRecipe(recipe)) {
+    showToast(
+      "Only the recipe creator or an admin can delete this recipe."
+    );
+
     return;
   }
 
