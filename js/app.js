@@ -166,7 +166,7 @@ async function loadRecipes() {
   const { data, error } = await supabaseClient
     .from("recipes")
     .select(
-      "id, title, author, ingredients, instructions, notes, created_at"
+      "id, title, author, category, ingredients, instructions, created_at, notes"
     )
     .order("created_at", { ascending: false });
 
@@ -198,7 +198,10 @@ function renderRecipes(filter = "") {
     return [
       recipe.title,
       recipe.author,
-      recipe.ingredients
+      recipe.category,
+      recipe.ingredients,
+      recipe.instructions,
+      recipe.notes
     ]
       .filter(Boolean)
       .some(value =>
@@ -232,17 +235,17 @@ function renderRecipes(filter = "") {
     card.className = "recipe-card";
     card.tabIndex = 0;
     card.setAttribute("role", "button");
-    card.setAttribute(
-      "aria-label",
-      `Open ${recipe.title}`
-    );
+    card.setAttribute("aria-label", `Open ${recipe.title}`);
 
     const title = document.createElement("h3");
     title.textContent = recipe.title;
 
     const meta = document.createElement("div");
     meta.className = "meta";
-    meta.textContent = `by ${recipe.author}`;
+
+    meta.textContent = recipe.category
+      ? `${recipe.category} · by ${recipe.author}`
+      : `by ${recipe.author}`;
 
     const preview = document.createElement("div");
     preview.className = "preview";
@@ -274,9 +277,7 @@ function renderRecipes(filter = "") {
 }
 
 function openView(id) {
-  const recipe = state.recipes.find(
-    item => item.id === id
-  );
+  const recipe = state.recipes.find(item => item.id === id);
 
   if (!recipe) {
     return;
@@ -288,11 +289,14 @@ function openView(id) {
     recipe.title;
 
   const dateText = formatDate(recipe.created_at);
+  const categoryText = recipe.category
+    ? `${recipe.category} · `
+    : "";
 
   document.getElementById("viewMeta").textContent =
     dateText
-      ? `Shared by ${recipe.author} · ${dateText}`
-      : `Shared by ${recipe.author}`;
+      ? `${categoryText}Shared by ${recipe.author} · ${dateText}`
+      : `${categoryText}Shared by ${recipe.author}`;
 
   const ingredientsList =
     document.getElementById("viewIngredients");
@@ -305,7 +309,6 @@ function openView(id) {
     .filter(Boolean)
     .forEach(line => {
       const item = document.createElement("li");
-
       item.textContent = line;
       ingredientsList.appendChild(item);
     });
@@ -382,6 +385,9 @@ function openEditForm() {
   document.getElementById("authorInput").value =
     recipe.author || "";
 
+  document.getElementById("categoryInput").value =
+    recipe.category || "";
+
   document.getElementById("ingredientsInput").value =
     recipe.ingredients || "";
 
@@ -407,9 +413,7 @@ function openEditForm() {
 
 function closeForm() {
   setModalOpen(formModal, false);
-
   state.editingRecipeId = null;
-
   setFormMessage("");
 }
 
@@ -440,6 +444,9 @@ async function saveRecipe(event) {
   const author =
     document.getElementById("authorInput").value.trim();
 
+  const category =
+    document.getElementById("categoryInput").value.trim();
+
   const ingredients =
     document
       .getElementById("ingredientsInput")
@@ -456,6 +463,7 @@ async function saveRecipe(event) {
   if (
     !title ||
     !author ||
+    !category ||
     !ingredients ||
     !instructions
   ) {
@@ -476,6 +484,7 @@ async function saveRecipe(event) {
   const payload = {
     title,
     author,
+    category,
     ingredients,
     instructions,
     notes
@@ -497,10 +506,7 @@ async function saveRecipe(event) {
   saveButton.disabled = false;
 
   if (result.error) {
-    console.error(
-      "Could not save recipe:",
-      result.error
-    );
+    console.error("Could not save recipe:", result.error);
 
     setFormMessage(
       result.error.message ||
@@ -511,11 +517,9 @@ async function saveRecipe(event) {
     return;
   }
 
-  const wasEditing =
-    Boolean(state.editingRecipeId);
+  const wasEditing = Boolean(state.editingRecipeId);
 
   closeForm();
-
   searchInput.value = "";
 
   await loadRecipes();
@@ -563,10 +567,7 @@ async function deleteCurrent() {
   deleteButton.disabled = false;
 
   if (error) {
-    console.error(
-      "Could not delete recipe:",
-      error
-    );
+    console.error("Could not delete recipe:", error);
 
     showToast(
       error.message ||
@@ -592,63 +593,10 @@ function setAuthMessage(message, type = "") {
     `auth-message ${type}`.trim();
 }
 
-function prepareSignInModal() {
-  const authTitle =
-    document.getElementById("authTitle");
-
-  const submitButton =
-    document.getElementById("authSubmitBtn");
-
-  const passwordHint =
-    document.getElementById("passwordHint");
-
-  const passwordInput =
-    document.getElementById("passwordInput");
-
-  if (authTitle) {
-    authTitle.textContent = "Sign In";
-  }
-
-  if (submitButton) {
-    submitButton.textContent = "Sign In";
-    submitButton.disabled = false;
-  }
-
-  if (passwordHint) {
-    passwordHint.textContent =
-      "Enter your account password.";
-  }
-
-  if (passwordInput) {
-    passwordInput.autocomplete =
-      "current-password";
-  }
-
-  /*
-   * These may still exist in an older index.html.
-   * Hide them so the page remains compatible while
-   * preventing visitors from seeing a sign-up option.
-   */
-  const signInTab =
-    document.getElementById("signInTab");
-
-  const signUpTab =
-    document.getElementById("signUpTab");
-
-  if (signInTab) {
-    signInTab.hidden = true;
-  }
-
-  if (signUpTab) {
-    signUpTab.hidden = true;
-  }
-}
-
 function openAuth() {
   authForm.reset();
 
   setAuthMessage("");
-  prepareSignInModal();
   setModalOpen(authModal, true);
 
   document.getElementById("emailInput").focus();
@@ -702,14 +650,6 @@ async function submitAuth(event) {
       );
     }
 
-    /*
-     * This checks that the authenticated account has
-     * a corresponding user_roles record.
-     *
-     * Accounts manually created through your project
-     * should receive this record through your existing
-     * database trigger.
-     */
     const { data: roleData, error: roleError } =
       await supabaseClient
         .from("user_roles")
@@ -719,6 +659,7 @@ async function submitAuth(event) {
 
     if (roleError) {
       await supabaseClient.auth.signOut();
+
       throw new Error(
         "Your account access could not be verified."
       );
@@ -758,7 +699,6 @@ async function signOut() {
   if (error) {
     console.error("Sign-out failed:", error);
     showToast("Could not sign out.");
-
     return;
   }
 
@@ -809,10 +749,7 @@ async function loadAdminUsers() {
   loading.hidden = true;
 
   if (error) {
-    console.error(
-      "Could not list users:",
-      error
-    );
+    console.error("Could not list users:", error);
 
     message.textContent =
       error.message || "Users could not be loaded.";
@@ -824,35 +761,23 @@ async function loadAdminUsers() {
   }
 
   (data || []).forEach(user => {
-    const row =
-      document.createElement("div");
-
+    const row = document.createElement("div");
     row.className = "user-row";
 
-    const details =
-      document.createElement("div");
+    const details = document.createElement("div");
 
-    const email =
-      document.createElement("div");
-
+    const email = document.createElement("div");
     email.className = "user-email";
-    email.textContent =
-      user.email || "(No email)";
+    email.textContent = user.email || "(No email)";
 
-    const created =
-      document.createElement("div");
-
+    const created = document.createElement("div");
     created.className = "user-created";
     created.textContent =
-      `Joined ${
-        formatDate(user.created_at) ||
-        "unknown date"
-      }`;
+      `Joined ${formatDate(user.created_at) || "unknown date"}`;
 
     details.append(email, created);
 
-    const select =
-      document.createElement("select");
+    const select = document.createElement("select");
 
     select.setAttribute(
       "aria-label",
@@ -864,80 +789,67 @@ async function loadAdminUsers() {
       ["family", "Family"],
       ["admin", "Admin"]
     ].forEach(([value, label]) => {
-      const option =
-        document.createElement("option");
+      const option = document.createElement("option");
 
       option.value = value;
       option.textContent = label;
-      option.selected =
-        user.role === value;
+      option.selected = user.role === value;
 
       select.appendChild(option);
     });
 
-    select.addEventListener(
-      "change",
-      async () => {
-        const previousRole = user.role;
-        const newRole = select.value;
+    select.addEventListener("change", async () => {
+      const previousRole = user.role;
+      const newRole = select.value;
 
-        select.disabled = true;
+      select.disabled = true;
 
-        const { error: updateError } =
-          await supabaseClient.rpc(
-            "admin_set_user_role",
-            {
-              target_user_id: user.user_id,
-              new_role: newRole
-            }
-          );
+      const { error: updateError } =
+        await supabaseClient.rpc(
+          "admin_set_user_role",
+          {
+            target_user_id: user.user_id,
+            new_role: newRole
+          }
+        );
 
-        select.disabled = false;
+      select.disabled = false;
 
-        if (updateError) {
-          console.error(
-            "Could not change role:",
-            updateError
-          );
+      if (updateError) {
+        console.error(
+          "Could not change role:",
+          updateError
+        );
 
-          select.value = previousRole;
-
-          message.textContent =
-            updateError.message ||
-            "The user's role could not be changed.";
-
-          message.className =
-            "auth-message error";
-
-          return;
-        }
-
-        user.role = newRole;
+        select.value = previousRole;
 
         message.textContent =
-          `${user.email || "User"} is now ` +
-          `${formatRole(newRole)}.`;
+          updateError.message ||
+          "The user's role could not be changed.";
 
         message.className =
-          "auth-message success";
+          "auth-message error";
 
-        if (
-          user.user_id ===
-          state.currentUser?.id
-        ) {
-          await refreshSessionAndRole();
+        return;
+      }
 
-          if (
-            state.currentRole !== "admin"
-          ) {
-            closeAdminPanel();
-            showToast(
-              "Your role was changed."
-            );
-          }
+      user.role = newRole;
+
+      message.textContent =
+        `${user.email || "User"} is now ${formatRole(newRole)}.`;
+
+      message.className =
+        "auth-message success";
+
+      if (user.user_id === state.currentUser?.id) {
+        await refreshSessionAndRole();
+
+        if (state.currentRole !== "admin") {
+          closeAdminPanel();
+          showToast("Your role was changed.");
         }
       }
-    );
+    });
 
     row.append(details, select);
     list.appendChild(row);
@@ -946,25 +858,14 @@ async function loadAdminUsers() {
   list.hidden = false;
 }
 
-function closeOnBackdrop(
-  event,
-  modal,
-  closeFunction
-) {
+function closeOnBackdrop(event, modal, closeFunction) {
   if (event.target === modal) {
     closeFunction();
   }
 }
 
-addBtn.addEventListener(
-  "click",
-  openAddForm
-);
-
-emptyAddBtn.addEventListener(
-  "click",
-  openAddForm
-);
+addBtn.addEventListener("click", openAddForm);
+emptyAddBtn.addEventListener("click", openAddForm);
 
 document
   .getElementById("viewClose")
@@ -990,20 +891,10 @@ document
   .getElementById("formCancel")
   .addEventListener("click", closeForm);
 
-recipeForm.addEventListener(
-  "submit",
-  saveRecipe
-);
+recipeForm.addEventListener("submit", saveRecipe);
 
-authBtn.addEventListener(
-  "click",
-  openAuth
-);
-
-signOutBtn.addEventListener(
-  "click",
-  signOut
-);
+authBtn.addEventListener("click", openAuth);
+signOutBtn.addEventListener("click", signOut);
 
 document
   .getElementById("authClose")
@@ -1013,10 +904,7 @@ document
   .getElementById("authCancel")
   .addEventListener("click", closeAuth);
 
-authForm.addEventListener(
-  "submit",
-  submitAuth
-);
+authForm.addEventListener("submit", submitAuth);
 
 manageUsersBtn.addEventListener(
   "click",
@@ -1025,121 +913,68 @@ manageUsersBtn.addEventListener(
 
 document
   .getElementById("adminClose")
-  .addEventListener(
-    "click",
-    closeAdminPanel
-  );
+  .addEventListener("click", closeAdminPanel);
 
 document
   .getElementById("adminCloseBtn")
-  .addEventListener(
-    "click",
-    closeAdminPanel
-  );
+  .addEventListener("click", closeAdminPanel);
 
 document
   .getElementById("refreshUsersBtn")
-  .addEventListener(
-    "click",
-    loadAdminUsers
+  .addEventListener("click", loadAdminUsers);
+
+searchInput.addEventListener("input", () => {
+  renderRecipes(searchInput.value);
+});
+
+viewModal.addEventListener("click", event => {
+  closeOnBackdrop(event, viewModal, closeView);
+});
+
+formModal.addEventListener("click", event => {
+  closeOnBackdrop(event, formModal, closeForm);
+});
+
+authModal.addEventListener("click", event => {
+  closeOnBackdrop(event, authModal, closeAuth);
+});
+
+adminModal.addEventListener("click", event => {
+  closeOnBackdrop(
+    event,
+    adminModal,
+    closeAdminPanel
   );
+});
 
-searchInput.addEventListener(
-  "input",
-  () => {
-    renderRecipes(searchInput.value);
+document.addEventListener("keydown", event => {
+  if (event.key !== "Escape") {
+    return;
   }
-);
 
-viewModal.addEventListener(
-  "click",
-  event => {
-    closeOnBackdrop(
-      event,
-      viewModal,
-      closeView
-    );
+  if (adminModal.classList.contains("open")) {
+    closeAdminPanel();
+  } else if (authModal.classList.contains("open")) {
+    closeAuth();
+  } else if (formModal.classList.contains("open")) {
+    closeForm();
+  } else if (viewModal.classList.contains("open")) {
+    closeView();
   }
-);
+});
 
-formModal.addEventListener(
-  "click",
-  event => {
-    closeOnBackdrop(
-      event,
-      formModal,
-      closeForm
-    );
-  }
-);
-
-authModal.addEventListener(
-  "click",
-  event => {
-    closeOnBackdrop(
-      event,
-      authModal,
-      closeAuth
-    );
-  }
-);
-
-adminModal.addEventListener(
-  "click",
-  event => {
-    closeOnBackdrop(
-      event,
-      adminModal,
-      closeAdminPanel
-    );
-  }
-);
-
-document.addEventListener(
-  "keydown",
-  event => {
-    if (event.key !== "Escape") {
-      return;
-    }
-
-    if (
-      adminModal.classList.contains("open")
-    ) {
-      closeAdminPanel();
-    } else if (
-      authModal.classList.contains("open")
-    ) {
-      closeAuth();
-    } else if (
-      formModal.classList.contains("open")
-    ) {
-      closeForm();
-    } else if (
-      viewModal.classList.contains("open")
-    ) {
-      closeView();
-    }
-  }
-);
-
-supabaseClient.auth.onAuthStateChange(
-  async () => {
-    await refreshSessionAndRole();
-  }
-);
+supabaseClient.auth.onAuthStateChange(async () => {
+  await refreshSessionAndRole();
+});
 
 async function init() {
   if (!isConfigured()) {
     loadingState.textContent =
-      "Setup required: paste your Supabase " +
-      "publishable key into js/config.js.";
+      "Setup required: paste your Supabase publishable key into js/config.js.";
 
     authBtn.disabled = true;
-
     return;
   }
-
-  prepareSignInModal();
 
   await refreshSessionAndRole();
   await loadRecipes();
