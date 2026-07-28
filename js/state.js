@@ -12,7 +12,7 @@ export function canManageRecipes() {
   return state.currentRole === "family" || state.currentRole === "admin";
 }
 
-export function canDeleteRecipe(recipe) {
+export function canModifyRecipe(recipe) {
   if (!state.currentUser || !recipe) {
     return false;
   }
