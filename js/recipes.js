@@ -327,10 +327,7 @@ export function openAddForm() {
 }
 
 export function openEditForm() {
-  if (
-    !canManageRecipes() ||
-    !state.currentViewId
-  ) {
+  if (!state.currentViewId) {
     return;
   }
 
@@ -345,8 +342,15 @@ export function openEditForm() {
     return;
   }
 
-  state.editingRecipeId =
-    recipe.id;
+  if (!canModifyRecipe(recipe)) {
+    showToast(
+      "Only the recipe creator or an admin can edit this recipe."
+    );
+
+    return;
+  }
+
+  state.editingRecipeId = recipe.id;
 
   document
     .getElementById("titleInput")
