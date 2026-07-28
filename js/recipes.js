@@ -264,15 +264,15 @@ export function openView(id) {
       .textContent = "";
   }
 
-  document
-    .getElementById("editBtn")
-    .hidden =
-      !canManageRecipes();
+document
+  .getElementById("editBtn")
+  .hidden =
+    !canModifyRecipe(recipe);
 
-  document
+document
   .getElementById("deleteBtn")
   .hidden =
-    !canDeleteRecipe(recipe);
+    !canModifyRecipe(recipe);
 
   setModalOpen(
     viewModal,
