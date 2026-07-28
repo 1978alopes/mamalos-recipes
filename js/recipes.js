@@ -29,7 +29,7 @@ export async function loadRecipes() {
   const { data, error } = await supabaseClient
     .from("recipes")
     .select(
-      "id, title, author, category, ingredients, instructions, created_at, notes"
+      "id, title, author, category, ingredients, instructions, created_at, notes, created_by"
     )
     .order("created_at", { ascending: false });
 
@@ -496,14 +496,18 @@ export async function saveRecipe(
 
   setFormMessage("Saving…");
 
-  const payload = {
-    title,
-    author,
-    category,
-    ingredients,
-    instructions,
-    notes
-  };
+const payload = {
+  title,
+  author,
+  category,
+  ingredients,
+  instructions,
+  notes
+};
+
+if (!state.editingRecipeId) {
+  payload.created_by = state.currentUser.id;
+}
 
   let result;
 
