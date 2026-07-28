@@ -583,7 +583,7 @@ export async function deleteCurrent() {
     return;
   }
 
-  if (!canDeleteRecipe(recipe)) {
+  if (!canModifyRecipe(recipe)) {
     showToast(
       "Only the recipe creator or an admin can delete this recipe."
     );
