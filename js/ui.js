@@ -83,7 +83,7 @@ export function updateAccountUI() {
         "You can manage recipes and user roles.";
     } else if (state.currentRole === "family") {
       accountSubtext.textContent =
-        "You can add, edit, and delete recipes.";
+        "You can add, edit, and delete your own recipes.";
     } else {
       accountSubtext.textContent =
         "Your account can browse recipes.";
