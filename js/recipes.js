@@ -2,7 +2,8 @@
 
 import {
   state,
-  canManageRecipes
+  canManageRecipes,
+  canDeleteRecipe
 } from "./state.js";
 
 import {
@@ -269,9 +270,9 @@ export function openView(id) {
       !canManageRecipes();
 
   document
-    .getElementById("deleteBtn")
-    .hidden =
-      !canManageRecipes();
+  .getElementById("deleteBtn")
+  .hidden =
+    !canDeleteRecipe(recipe);
 
   setModalOpen(
     viewModal,
