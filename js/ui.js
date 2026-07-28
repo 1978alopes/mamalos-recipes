@@ -99,7 +99,7 @@ export function updateAccountUI() {
   addBtn.hidden = !manageRecipes;
   emptyAddBtn.hidden = !manageRecipes;
 
-  document.getElementById("editBtn").hidden = !manageRecipes;
+  document.getElementById("editBtn").hidden = true;
   document.getElementById("deleteBtn").hidden = true;
 }
 
