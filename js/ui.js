@@ -100,7 +100,7 @@ export function updateAccountUI() {
   emptyAddBtn.hidden = !manageRecipes;
 
   document.getElementById("editBtn").hidden = !manageRecipes;
-  document.getElementById("deleteBtn").hidden = !manageRecipes;
+  document.getElementById("deleteBtn").hidden = true;
 }
 
 export function setFormMessage(message, type = "") {
