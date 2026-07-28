@@ -10,27 +10,62 @@
 <body>
   <header>
     <h1>Mamalo's Family Recipes</h1>
-    <p>Treasured dishes from the kitchen, shared with love for family and friends</p>
+    <p>
+      Treasured dishes from the kitchen, shared with love for family and friends
+    </p>
   </header>
 
   <main class="container">
     <section class="account-bar" aria-label="Account controls">
       <div class="account-summary">
         <span id="roleBadge" class="role-badge guest">Guest</span>
+
         <div class="account-text">
-          <div id="accountEmail" class="account-email">Not signed in</div>
-          <div id="accountSubtext" class="account-subtext">Guests can browse family recipes.</div>
+          <div id="accountEmail" class="account-email">
+            Not signed in
+          </div>
+
+          <div id="accountSubtext" class="account-subtext">
+            Guests can browse family recipes.
+          </div>
         </div>
       </div>
 
       <div class="account-actions">
-        <button class="btn btn-secondary btn-small" id="manageUsersBtn" hidden>Manage Users</button>
-        <button class="btn btn-ghost btn-small" id="signOutBtn" hidden>Sign Out</button>
+        <button
+          type="button"
+          class="btn btn-primary btn-small"
+          id="authBtn"
+        >
+          Sign In
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary btn-small"
+          id="manageUsersBtn"
+          hidden
+        >
+          Manage Users
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-ghost btn-small"
+          id="signOutBtn"
+          hidden
+        >
+          Sign Out
+        </button>
       </div>
     </section>
 
     <section class="toolbar">
       <div class="search-wrap">
+        <label class="sr-only" for="searchInput">
+          Search recipes
+        </label>
+
         <input
           type="search"
           id="searchInput"
@@ -40,16 +75,38 @@
       </div>
 
       <div class="toolbar-actions">
-        <button class="btn btn-primary" id="addBtn" hidden>+ Add Recipe</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="addBtn"
+          hidden
+        >
+          + Add Recipe
+        </button>
       </div>
     </section>
 
-    <div id="loadingState" class="status-message">Loading recipes…</div>
-    <div id="recipeGrid" class="recipe-grid" hidden></div>
+    <div id="loadingState" class="status-message">
+      Loading recipes…
+    </div>
+
+    <div
+      id="recipeGrid"
+      class="recipe-grid"
+      hidden
+    ></div>
 
     <div id="emptyState" class="empty-state" hidden>
       <p>No recipes have been added yet.</p>
-      <button class="btn btn-primary" id="emptyAddBtn" hidden>+ Add Recipe</button>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        id="emptyAddBtn"
+        hidden
+      >
+        + Add Recipe
+      </button>
     </div>
   </main>
 
@@ -58,48 +115,127 @@
   </footer>
 
   <!-- View recipe modal -->
-  <div class="modal-overlay" id="viewModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="viewTitle">
+  <div
+    class="modal-overlay"
+    id="viewModal"
+    aria-hidden="true"
+  >
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="viewTitle"
+    >
       <div class="modal-header">
         <h2 id="viewTitle"></h2>
-        <button class="modal-close" id="viewClose" aria-label="Close">&times;</button>
+
+        <button
+          type="button"
+          class="modal-close"
+          id="viewClose"
+          aria-label="Close"
+        >
+          &times;
+        </button>
       </div>
 
       <div class="modal-body">
         <div class="detail-meta" id="viewMeta"></div>
 
-        <div class="section-label">Ingredients</div>
-        <ul class="ingredients-list" id="viewIngredients"></ul>
+        <div class="section-label">
+          Ingredients
+        </div>
 
-        <div class="section-label">Instructions</div>
-        <div class="instructions" id="viewInstructions"></div>
+        <ul
+          class="ingredients-list"
+          id="viewIngredients"
+        ></ul>
+
+        <div class="section-label">
+          Instructions
+        </div>
+
+        <div
+          class="instructions"
+          id="viewInstructions"
+        ></div>
 
         <div id="viewNotesWrap" hidden>
-          <div class="section-label">Notes</div>
-          <div class="notes" id="viewNotes"></div>
+          <div class="section-label">
+            Notes
+          </div>
+
+          <div
+            class="notes"
+            id="viewNotes"
+          ></div>
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-ghost" id="viewCloseBtn">Close</button>
-          <button class="btn btn-secondary" id="editBtn" hidden>Edit</button>
-          <button class="btn btn-danger" id="deleteBtn" hidden>Delete</button>
+          <button
+            type="button"
+            class="btn btn-ghost"
+            id="viewCloseBtn"
+          >
+            Close
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="editBtn"
+            hidden
+          >
+            Edit
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-danger"
+            id="deleteBtn"
+            hidden
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Add/edit recipe modal -->
-  <div class="modal-overlay" id="formModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+  <div
+    class="modal-overlay"
+    id="formModal"
+    aria-hidden="true"
+  >
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="formTitle"
+    >
       <div class="modal-header">
-        <h2 id="formTitle">Add a Recipe</h2>
-        <button class="modal-close" id="formClose" aria-label="Close">&times;</button>
+        <h2 id="formTitle">
+          Add a Recipe
+        </h2>
+
+        <button
+          type="button"
+          class="modal-close"
+          id="formClose"
+          aria-label="Close"
+        >
+          &times;
+        </button>
       </div>
 
       <div class="modal-body">
         <form id="recipeForm">
           <div class="form-group">
-            <label for="titleInput">Recipe Name *</label>
+            <label for="titleInput">
+              Recipe Name *
+            </label>
+
             <input
               type="text"
               id="titleInput"
@@ -110,7 +246,10 @@
           </div>
 
           <div class="form-group">
-            <label for="authorInput">Shared By *</label>
+            <label for="authorInput">
+              Shared By *
+            </label>
+
             <input
               type="text"
               id="authorInput"
@@ -121,18 +260,27 @@
           </div>
 
           <div class="form-group">
-            <label for="ingredientsInput">Ingredients *</label>
+            <label for="ingredientsInput">
+              Ingredients *
+            </label>
+
             <textarea
               id="ingredientsInput"
               class="tall"
               required
               placeholder="One ingredient per line&#10;2 cups flour&#10;1 tsp salt&#10;..."
             ></textarea>
-            <p class="form-hint">Put each ingredient on its own line.</p>
+
+            <p class="form-hint">
+              Put each ingredient on its own line.
+            </p>
           </div>
 
           <div class="form-group">
-            <label for="instructionsInput">Instructions *</label>
+            <label for="instructionsInput">
+              Instructions *
+            </label>
+
             <textarea
               id="instructionsInput"
               class="tall"
@@ -142,46 +290,95 @@
           </div>
 
           <div class="form-group">
-            <label for="notesInput">Notes (optional)</label>
+            <label for="notesInput">
+              Notes (optional)
+            </label>
+
             <textarea
               id="notesInput"
               placeholder="Tips, variations, or memories..."
             ></textarea>
           </div>
 
-          <div id="recipeFormMessage" class="auth-message" aria-live="polite"></div>
+          <div
+            id="recipeFormMessage"
+            class="auth-message"
+            aria-live="polite"
+          ></div>
 
           <div class="modal-actions">
-            <button type="button" class="btn btn-ghost" id="formCancel">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="saveRecipeBtn">Save Recipe</button>
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="formCancel"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="saveRecipeBtn"
+            >
+              Save Recipe
+            </button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- Authentication modal -->
-  <div class="modal-overlay" id="authModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <!-- Sign-in modal -->
+  <div
+    class="modal-overlay"
+    id="authModal"
+    aria-hidden="true"
+  >
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="authTitle"
+    >
       <div class="modal-header">
-        <h2 id="authTitle">Sign In</h2>
-        <button class="modal-close" id="authClose" aria-label="Close">&times;</button>
+        <h2 id="authTitle">
+          Sign In
+        </h2>
+
+        <button
+          type="button"
+          class="modal-close"
+          id="authClose"
+          aria-label="Close"
+        >
+          &times;
+        </button>
       </div>
 
       <div class="modal-body">
-        <div class="auth-tabs">
-          <button class="btn btn-ghost auth-tab active" id="signInTab" type="button">Sign In</button>
-          <button class="btn btn-ghost auth-tab" id="signUpTab" type="button">Create Account</button>
-        </div>
+        <p class="form-hint">
+          Sign in using an account created by the site administrator.
+        </p>
 
         <form id="authForm">
           <div class="form-group">
-            <label for="emailInput">Email</label>
-            <input type="email" id="emailInput" required autocomplete="email" />
+            <label for="emailInput">
+              Email
+            </label>
+
+            <input
+              type="email"
+              id="emailInput"
+              required
+              autocomplete="email"
+            />
           </div>
 
           <div class="form-group">
-            <label for="passwordInput">Password</label>
+            <label for="passwordInput">
+              Password
+            </label>
+
             <input
               type="password"
               id="passwordInput"
@@ -189,14 +386,37 @@
               minlength="8"
               autocomplete="current-password"
             />
-            <p class="form-hint" id="passwordHint">Enter your account password.</p>
+
+            <p
+              class="form-hint"
+              id="passwordHint"
+            >
+              Enter your account password.
+            </p>
           </div>
 
-          <div id="authMessage" class="auth-message" aria-live="polite"></div>
+          <div
+            id="authMessage"
+            class="auth-message"
+            aria-live="polite"
+          ></div>
 
           <div class="modal-actions">
-            <button type="button" class="btn btn-ghost" id="authCancel">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="authSubmitBtn">Sign In</button>
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="authCancel"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="authSubmitBtn"
+            >
+              Sign In
+            </button>
           </div>
         </form>
       </div>
@@ -204,30 +424,85 @@
   </div>
 
   <!-- Admin user management modal -->
-  <div class="modal-overlay" id="adminModal" aria-hidden="true">
-    <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+  <div
+    class="modal-overlay"
+    id="adminModal"
+    aria-hidden="true"
+  >
+    <div
+      class="modal modal-wide"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="adminTitle"
+    >
       <div class="modal-header">
         <div>
-          <h2 id="adminTitle">Manage Users</h2>
-          <p class="account-subtext">Assign Signed In, Family, or Admin access.</p>
+          <h2 id="adminTitle">
+            Manage Users
+          </h2>
+
+          <p class="account-subtext">
+            Assign Signed In, Family, or Admin access.
+          </p>
         </div>
-        <button class="modal-close" id="adminClose" aria-label="Close">&times;</button>
+
+        <button
+          type="button"
+          class="modal-close"
+          id="adminClose"
+          aria-label="Close"
+        >
+          &times;
+        </button>
       </div>
 
       <div class="modal-body">
-        <div id="adminMessage" class="auth-message" aria-live="polite"></div>
-        <div id="adminLoading" class="status-message">Loading users…</div>
-        <div id="userList" class="user-list" hidden></div>
+        <div
+          id="adminMessage"
+          class="auth-message"
+          aria-live="polite"
+        ></div>
+
+        <div
+          id="adminLoading"
+          class="status-message"
+        >
+          Loading users…
+        </div>
+
+        <div
+          id="userList"
+          class="user-list"
+          hidden
+        ></div>
 
         <div class="modal-actions">
-          <button class="btn btn-ghost" id="adminCloseBtn">Close</button>
-          <button class="btn btn-secondary" id="refreshUsersBtn">Refresh</button>
+          <button
+            type="button"
+            class="btn btn-ghost"
+            id="adminCloseBtn"
+          >
+            Close
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="refreshUsersBtn"
+          >
+            Refresh
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div
+    class="toast"
+    id="toast"
+    role="status"
+    aria-live="polite"
+  ></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
