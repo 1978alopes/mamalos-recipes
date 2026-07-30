@@ -11,6 +11,7 @@ import {
   loadingState,
   emptyState,
   searchInput,
+  categoryFilter,
   recipeForm,
   viewModal,
   formModal,
@@ -54,33 +55,67 @@ export async function loadRecipes() {
 
   state.recipes = data || [];
 
-  renderRecipes(searchInput.value);
+  populateCategoryFilter();
+  renderRecipes();
 }
 
-export function renderRecipes(filter = "") {
+function populateCategoryFilter() {
+  const selectedCategory = categoryFilter.value;
+
+  const categories = [
+    ...new Set(
+      state.recipes
+        .map(recipe => recipe.category?.trim())
+        .filter(Boolean)
+    )
+  ].sort((a, b) => a.localeCompare(b));
+
+  categoryFilter.innerHTML = "";
+  categoryFilter.add(new Option("All types", ""));
+
+  categories.forEach(category => {
+    categoryFilter.add(new Option(category, category));
+  });
+
+  categoryFilter.value =
+    categories.includes(selectedCategory)
+      ? selectedCategory
+      : "";
+}
+
+export function renderRecipes() {
   const query =
-    filter.trim().toLowerCase();
+    searchInput.value.trim().toLowerCase();
+
+  const selectedCategory =
+    categoryFilter.value.trim().toLowerCase();
 
   const filtered =
     state.recipes.filter(recipe => {
-      if (!query) {
-        return true;
-      }
+      const matchesCategory =
+        !selectedCategory ||
+        String(recipe.category || "")
+          .trim()
+          .toLowerCase() === selectedCategory;
 
-      return [
-        recipe.title,
-        recipe.author,
-        recipe.category,
-        recipe.ingredients,
-        recipe.instructions,
-        recipe.notes
-      ]
-        .filter(Boolean)
-        .some(value =>
-          String(value)
-            .toLowerCase()
-            .includes(query)
-        );
+      const matchesSearch =
+        !query ||
+        [
+          recipe.title,
+          recipe.author,
+          recipe.category,
+          recipe.ingredients,
+          recipe.instructions,
+          recipe.notes
+        ]
+          .filter(Boolean)
+          .some(value =>
+            String(value)
+              .toLowerCase()
+              .includes(query)
+          );
+
+      return matchesCategory && matchesSearch;
     });
 
   recipeGrid.innerHTML = "";
@@ -93,8 +128,9 @@ export function renderRecipes(filter = "") {
       emptyState.querySelector("p");
 
     if (emptyText) {
-      emptyText.textContent = query
-        ? "No recipes match your search."
+      emptyText.textContent =
+        query || selectedCategory
+        ? "No recipes match your filters."
         : "No recipes have been added yet.";
     }
 
@@ -132,10 +168,20 @@ export function renderRecipes(filter = "") {
 
     meta.className = "meta";
 
-    meta.textContent =
-      recipe.category
-        ? `${recipe.category} · by ${recipe.author}`
-        : `by ${recipe.author}`;
+    if (recipe.category) {
+      const category =
+        document.createElement("strong");
+
+      category.className = "recipe-category";
+      category.textContent = recipe.category;
+
+      meta.append(
+        category,
+        ` · by ${recipe.author}`
+      );
+    } else {
+      meta.textContent = `by ${recipe.author}`;
+    }
 
     const preview =
       document.createElement("div");
@@ -202,17 +248,26 @@ export function openView(id) {
   const dateText =
     formatDate(recipe.created_at);
 
-  const categoryText =
-    recipe.category
-      ? `${recipe.category} · `
-      : "";
+  const viewMeta =
+    document.getElementById("viewMeta");
 
-  document
-    .getElementById("viewMeta")
-    .textContent =
-      dateText
-        ? `${categoryText}Shared by ${recipe.author} · ${dateText}`
-        : `${categoryText}Shared by ${recipe.author}`;
+  viewMeta.innerHTML = "";
+
+  if (recipe.category) {
+    const category =
+      document.createElement("strong");
+
+    category.className = "recipe-category";
+    category.textContent = recipe.category;
+
+    viewMeta.append(category, " · ");
+  }
+
+  viewMeta.append(
+    dateText
+      ? `Shared by ${recipe.author} · ${dateText}`
+      : `Shared by ${recipe.author}`
+  );
 
   const ingredientsList =
     document.getElementById(
@@ -557,6 +612,7 @@ if (!state.editingRecipeId) {
   closeForm();
 
   searchInput.value = "";
+  categoryFilter.value = "";
 
   await loadRecipes();
 
