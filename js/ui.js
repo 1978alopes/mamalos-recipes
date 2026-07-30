@@ -6,6 +6,7 @@ export const recipeGrid = document.getElementById("recipeGrid");
 export const loadingState = document.getElementById("loadingState");
 export const emptyState = document.getElementById("emptyState");
 export const searchInput = document.getElementById("searchInput");
+export const categoryFilter = document.getElementById("categoryFilter");
 export const toast = document.getElementById("toast");
 
 export const roleBadge = document.getElementById("roleBadge");

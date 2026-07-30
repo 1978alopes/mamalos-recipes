@@ -9,6 +9,7 @@ import {
   recipeForm,
   authForm,
   searchInput,
+  categoryFilter,
   viewModal,
   formModal,
   authModal,
@@ -170,11 +171,12 @@ function bindEvents() {
 
   searchInput.addEventListener(
     "input",
-    () => {
-      renderRecipes(
-        searchInput.value
-      );
-    }
+    renderRecipes
+  );
+
+  categoryFilter.addEventListener(
+    "change",
+    renderRecipes
   );
 
   viewModal.addEventListener(
