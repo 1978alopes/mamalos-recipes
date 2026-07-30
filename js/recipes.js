@@ -4,7 +4,7 @@ import {
   state,
   canManageRecipes,
   canModifyRecipe
-} from "./state.js";
+} from "./state.js?v=20260730";
 
 import {
   recipeGrid,
@@ -19,7 +19,7 @@ import {
   setModalOpen,
   formatDate,
   setFormMessage
-} from "./ui.js";
+} from "./ui.js?v=20260730";
 
 export async function loadRecipes() {
   loadingState.hidden = false;
@@ -62,10 +62,17 @@ export async function loadRecipes() {
 function populateCategoryFilter() {
   const selectedCategory = categoryFilter.value;
 
+  const categoryInput =
+    document.getElementById("categoryInput");
+
   const categories = [
     ...new Set(
-      state.recipes
-        .map(recipe => recipe.category?.trim())
+      [
+        ...Array.from(categoryInput.options)
+          .map(option => option.value.trim()),
+        ...state.recipes
+          .map(recipe => recipe.category?.trim())
+      ]
         .filter(Boolean)
     )
   ].sort((a, b) => a.localeCompare(b));
