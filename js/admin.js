@@ -1,6 +1,6 @@
 "use strict";
 
-import { state } from "./state.js";
+import { state } from "./state.js?v=20260730";
 
 import {
   adminModal,
@@ -8,11 +8,11 @@ import {
   setModalOpen,
   formatDate,
   formatRole
-} from "./ui.js";
+} from "./ui.js?v=20260730";
 
 import {
   refreshSessionAndRole
-} from "./auth.js";
+} from "./auth.js?v=20260730";
 
 export async function openAdminPanel() {
   if (state.currentRole !== "admin") {

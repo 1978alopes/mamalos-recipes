@@ -17,7 +17,7 @@ import {
   loadingState,
   closeOnBackdrop,
   setModalOpen
-} from "./ui.js";
+} from "./ui.js?v=20260730";
 
 import {
   isConfigured,
@@ -27,7 +27,7 @@ import {
   submitAuth,
   signOut,
   listenForAuthChanges
-} from "./auth.js";
+} from "./auth.js?v=20260730";
 
 import {
   loadRecipes,
@@ -38,13 +38,13 @@ import {
   closeForm,
   saveRecipe,
   deleteCurrent
-} from "./recipes.js";
+} from "./recipes.js?v=20260730";
 
 import {
   openAdminPanel,
   closeAdminPanel,
   loadAdminUsers
-} from "./admin.js";
+} from "./admin.js?v=20260730";
 
 function bindEvents() {
   addBtn.addEventListener(
