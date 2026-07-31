@@ -4,30 +4,36 @@ import {
   addBtn,
   emptyAddBtn,
   authBtn,
+  requestAccessBtn,
   signOutBtn,
   manageUsersBtn,
   recipeForm,
   authForm,
+  requestAccessForm,
   searchInput,
   categoryFilter,
   viewModal,
   formModal,
   authModal,
+  requestAccessModal,
   adminModal,
   loadingState,
   closeOnBackdrop,
   setModalOpen
-} from "./ui.js?v=20260730";
+} from "./ui.js?v=20260731-1";
 
 import {
   isConfigured,
   refreshSessionAndRole,
   openAuth,
   closeAuth,
+  openRequestAccess,
+  closeRequestAccess,
+  submitAccessRequest,
   submitAuth,
   signOut,
   listenForAuthChanges
-} from "./auth.js?v=20260730";
+} from "./auth.js?v=20260731-1";
 
 import {
   loadRecipes,
@@ -38,13 +44,13 @@ import {
   closeForm,
   saveRecipe,
   deleteCurrent
-} from "./recipes.js?v=20260730";
+} from "./recipes.js?v=20260731-1";
 
 import {
   openAdminPanel,
   closeAdminPanel,
   loadAdminUsers
-} from "./admin.js?v=20260730";
+} from "./admin.js?v=20260731-1";
 
 function bindEvents() {
   addBtn.addEventListener(
@@ -109,11 +115,36 @@ function bindEvents() {
     openAuth
   );
 
+  requestAccessBtn.addEventListener(
+    "click",
+    openRequestAccess
+  );
+
+  document
+    .getElementById("requestAccessClose")
+    .addEventListener(
+      "click",
+      closeRequestAccess
+    );
+
+  document
+    .getElementById("requestAccessCancel")
+    .addEventListener(
+      "click",
+      closeRequestAccess
+    );
+
+  requestAccessForm.addEventListener(
+    "submit",
+    submitAccessRequest
+  );
+
   signOutBtn.addEventListener(
     "click",
     async () => {
       closeView();
       closeForm();
+      closeRequestAccess();
 
       setModalOpen(
         adminModal,
@@ -212,6 +243,17 @@ function bindEvents() {
     }
   );
 
+  requestAccessModal.addEventListener(
+    "click",
+    event => {
+      closeOnBackdrop(
+        event,
+        requestAccessModal,
+        closeRequestAccess
+      );
+    }
+  );
+
   adminModal.addEventListener(
     "click",
     event => {
@@ -238,6 +280,12 @@ function bindEvents() {
         )
       ) {
         closeAdminPanel();
+      } else if (
+        requestAccessModal.classList.contains(
+          "open"
+        )
+      ) {
+        closeRequestAccess();
       } else if (
         authModal.classList.contains(
           "open"
@@ -269,6 +317,7 @@ async function init() {
       "Setup required: paste your Supabase publishable key into js/config.js.";
 
     authBtn.disabled = true;
+    requestAccessBtn.disabled = true;
 
     return;
   }

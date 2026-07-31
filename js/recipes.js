@@ -4,7 +4,7 @@ import {
   state,
   canManageRecipes,
   canModifyRecipe
-} from "./state.js?v=20260730";
+} from "./state.js?v=20260731-1";
 
 import {
   recipeGrid,
@@ -19,7 +19,28 @@ import {
   setModalOpen,
   formatDate,
   setFormMessage
-} from "./ui.js?v=20260730";
+} from "./ui.js?v=20260731-1";
+
+let shouldAnimateCards = true;
+const recipeOrder = new Map();
+const MAX_VISIBLE_RECIPES = 30;
+
+function randomizeRecipes(recipes) {
+  recipes.forEach(recipe => {
+    if (!recipeOrder.has(recipe.id)) {
+      recipeOrder.set(
+        recipe.id,
+        Math.random()
+      );
+    }
+  });
+
+  return [...recipes].sort(
+    (a, b) =>
+      recipeOrder.get(a.id) -
+      recipeOrder.get(b.id)
+  );
+}
 
 export async function loadRecipes() {
   loadingState.hidden = false;
@@ -53,7 +74,8 @@ export async function loadRecipes() {
     return;
   }
 
-  state.recipes = data || [];
+  state.recipes =
+    randomizeRecipes(data || []);
 
   populateCategoryFilter();
   renderRecipes();
@@ -125,6 +147,9 @@ export function renderRecipes() {
       return matchesCategory && matchesSearch;
     });
 
+  const visibleRecipes =
+    filtered.slice(0, MAX_VISIBLE_RECIPES);
+
   recipeGrid.innerHTML = "";
 
   if (filtered.length === 0) {
@@ -147,11 +172,29 @@ export function renderRecipes() {
   emptyState.hidden = true;
   recipeGrid.hidden = false;
 
-  filtered.forEach(recipe => {
+  visibleRecipes.forEach((recipe, index) => {
     const card =
       document.createElement("article");
 
     card.className = "recipe-card";
+
+    if (shouldAnimateCards) {
+      card.classList.add("recipe-card-enter");
+      card.style.setProperty(
+        "--card-index",
+        index
+      );
+
+      card.addEventListener(
+        "animationend",
+        () => {
+          card.classList.remove("recipe-card-enter");
+          card.style.removeProperty("--card-index");
+        },
+        { once: true }
+      );
+    }
+
     card.tabIndex = 0;
 
     card.setAttribute(
@@ -233,6 +276,8 @@ export function renderRecipes() {
 
     recipeGrid.appendChild(card);
   });
+
+  shouldAnimateCards = false;
 }
 
 export function openView(id) {

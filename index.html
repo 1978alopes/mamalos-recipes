@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Annie+Use+Your+Telescope&family=Edu+VIC+WA+NT+Hand:wght@400..700&family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=20260730" />
+  <link rel="stylesheet" href="css/styles.css?v=20260731-1" />
 </head>
 
 <body>
@@ -41,6 +41,14 @@
           id="authBtn"
         >
           Sign In
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary btn-small"
+          id="requestAccessBtn"
+        >
+          Request Access
         </button>
 
         <button
@@ -385,7 +393,7 @@
 
       <div class="modal-body">
         <p class="form-hint">
-          Sign in using an account created by the site administrator.
+          Sign in after an administrator has approved your account.
         </p>
 
         <form id="authForm">
@@ -451,6 +459,99 @@
     </div>
   </div>
 
+  <!-- Request-access modal -->
+  <div
+    class="modal-overlay"
+    id="requestAccessModal"
+    aria-hidden="true"
+  >
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="requestAccessTitle"
+    >
+      <div class="modal-header">
+        <h2 id="requestAccessTitle">
+          Request Access
+        </h2>
+
+        <button
+          type="button"
+          class="modal-close"
+          id="requestAccessClose"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="form-hint">
+          Create an account request. An administrator must approve it before you can sign in.
+        </p>
+
+        <form id="requestAccessForm">
+          <div class="form-group">
+            <label for="requestEmailInput">Email</label>
+            <input
+              type="email"
+              id="requestEmailInput"
+              required
+              autocomplete="email"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="requestPasswordInput">Password</label>
+            <input
+              type="password"
+              id="requestPasswordInput"
+              required
+              minlength="8"
+              autocomplete="new-password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="requestPasswordConfirmInput">Confirm Password</label>
+            <input
+              type="password"
+              id="requestPasswordConfirmInput"
+              required
+              minlength="8"
+              autocomplete="new-password"
+            />
+          </div>
+
+          <div
+            id="requestAccessMessage"
+            class="auth-message"
+            aria-live="polite"
+          ></div>
+
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="requestAccessCancel"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="requestAccessSubmitBtn"
+            >
+              Submit Request
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Admin user management modal -->
   <div
     class="modal-overlay"
@@ -470,7 +571,7 @@
           </h2>
 
           <p class="account-subtext">
-            Assign Signed In, Family, or Admin access.
+            Approve pending requests and assign account access.
           </p>
         </div>
 
@@ -533,7 +634,7 @@
   ></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/config.js?v=20260730"></script>
-  <script type="module" src="js/app.js?v=20260730"></script>
+  <script src="js/config.js?v=20260731-1"></script>
+  <script type="module" src="js/app.js?v=20260731-1"></script>
 </body>
 </html>

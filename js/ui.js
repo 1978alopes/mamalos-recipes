@@ -1,6 +1,6 @@
 "use strict";
 
-import { state, canManageRecipes } from "./state.js?v=20260730";
+import { state, canManageRecipes } from "./state.js?v=20260731-1";
 
 export const recipeGrid = document.getElementById("recipeGrid");
 export const loadingState = document.getElementById("loadingState");
@@ -13,6 +13,7 @@ export const roleBadge = document.getElementById("roleBadge");
 export const accountEmail = document.getElementById("accountEmail");
 export const accountSubtext = document.getElementById("accountSubtext");
 export const authBtn = document.getElementById("authBtn");
+export const requestAccessBtn = document.getElementById("requestAccessBtn");
 export const signOutBtn = document.getElementById("signOutBtn");
 export const manageUsersBtn = document.getElementById("manageUsersBtn");
 export const addBtn = document.getElementById("addBtn");
@@ -21,10 +22,12 @@ export const emptyAddBtn = document.getElementById("emptyAddBtn");
 export const viewModal = document.getElementById("viewModal");
 export const formModal = document.getElementById("formModal");
 export const authModal = document.getElementById("authModal");
+export const requestAccessModal = document.getElementById("requestAccessModal");
 export const adminModal = document.getElementById("adminModal");
 
 export const recipeForm = document.getElementById("recipeForm");
 export const authForm = document.getElementById("authForm");
+export const requestAccessForm = document.getElementById("requestAccessForm");
 
 export function showToast(message) {
   toast.textContent = message;
@@ -44,6 +47,7 @@ export function formatRole(role) {
   if (role === "admin") return "Admin";
   if (role === "family") return "Family";
   if (role === "signed_in") return "Signed In";
+  if (role === "pending") return "Pending";
 
   return "Guest";
 }
@@ -73,6 +77,7 @@ export function updateAccountUI() {
     accountSubtext.textContent = "Guests can browse family recipes.";
 
     authBtn.hidden = false;
+    requestAccessBtn.hidden = false;
     signOutBtn.hidden = true;
     manageUsersBtn.hidden = true;
   } else {
@@ -85,12 +90,16 @@ export function updateAccountUI() {
     } else if (state.currentRole === "family") {
       accountSubtext.textContent =
         "You can add, edit, and delete your own recipes.";
+    } else if (state.currentRole === "pending") {
+      accountSubtext.textContent =
+        "Your access request is awaiting administrator approval.";
     } else {
       accountSubtext.textContent =
         "Your account can browse recipes.";
     }
 
     authBtn.hidden = true;
+    requestAccessBtn.hidden = true;
     signOutBtn.hidden = false;
     manageUsersBtn.hidden = state.currentRole !== "admin";
   }
@@ -113,6 +122,13 @@ export function setFormMessage(message, type = "") {
 
 export function setAuthMessage(message, type = "") {
   const element = document.getElementById("authMessage");
+
+  element.textContent = message;
+  element.className = `auth-message ${type}`.trim();
+}
+
+export function setRequestAccessMessage(message, type = "") {
+  const element = document.getElementById("requestAccessMessage");
 
   element.textContent = message;
   element.className = `auth-message ${type}`.trim();
