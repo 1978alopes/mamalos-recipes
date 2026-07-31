@@ -1,15 +1,18 @@
 "use strict";
 
-import { state } from "./state.js?v=20260730";
+import { state } from "./state.js?v=20260731-1";
 
 import {
   authForm,
   authModal,
+  requestAccessForm,
+  requestAccessModal,
   showToast,
   setModalOpen,
   setAuthMessage,
+  setRequestAccessMessage,
   updateAccountUI
-} from "./ui.js?v=20260730";
+} from "./ui.js?v=20260731-1";
 
 export function isConfigured() {
   return (
@@ -48,7 +51,7 @@ export async function refreshSessionAndRole() {
 
       state.currentRole = "signed_in";
     } else {
-      state.currentRole = data?.role || "signed_in";
+      state.currentRole = data?.role || "pending";
     }
   }
 
@@ -56,6 +59,7 @@ export async function refreshSessionAndRole() {
 }
 
 export function openAuth() {
+  closeRequestAccess();
   authForm.reset();
 
   setAuthMessage("");
@@ -67,6 +71,93 @@ export function openAuth() {
 export function closeAuth() {
   setModalOpen(authModal, false);
   setAuthMessage("");
+}
+
+export function openRequestAccess() {
+  closeAuth();
+  requestAccessForm.reset();
+
+  setRequestAccessMessage("");
+  setModalOpen(requestAccessModal, true);
+
+  document.getElementById("requestEmailInput").focus();
+}
+
+export function closeRequestAccess() {
+  setModalOpen(requestAccessModal, false);
+  setRequestAccessMessage("");
+}
+
+export async function submitAccessRequest(event) {
+  event.preventDefault();
+
+  const email =
+    document.getElementById("requestEmailInput").value.trim();
+
+  const password =
+    document.getElementById("requestPasswordInput").value;
+
+  const passwordConfirmation =
+    document.getElementById("requestPasswordConfirmInput").value;
+
+  const submitButton =
+    document.getElementById("requestAccessSubmitBtn");
+
+  if (!email || !password) {
+    setRequestAccessMessage(
+      "Enter your email and password.",
+      "error"
+    );
+
+    return;
+  }
+
+  if (password !== passwordConfirmation) {
+    setRequestAccessMessage(
+      "The passwords do not match.",
+      "error"
+    );
+
+    return;
+  }
+
+  submitButton.disabled = true;
+  submitButton.textContent = "Submitting…";
+
+  setRequestAccessMessage("Submitting your request…");
+
+  try {
+    const { data, error } =
+      await supabaseClient.auth.signUp({
+        email,
+        password
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    if (data.session) {
+      await supabaseClient.auth.signOut();
+    }
+
+    requestAccessForm.reset();
+
+    setRequestAccessMessage(
+      "Request received. Check your email if verification is required. An administrator must approve your account before you can sign in.",
+      "success"
+    );
+  } catch (error) {
+    console.error("Access request failed:", error);
+
+    setRequestAccessMessage(
+      error.message || "Your access request could not be submitted.",
+      "error"
+    );
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Submit Request";
+  }
 }
 
 export async function submitAuth(event) {

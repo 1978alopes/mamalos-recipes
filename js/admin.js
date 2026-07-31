@@ -1,6 +1,6 @@
 "use strict";
 
-import { state } from "./state.js?v=20260730";
+import { state } from "./state.js?v=20260731-1";
 
 import {
   adminModal,
@@ -8,11 +8,11 @@ import {
   setModalOpen,
   formatDate,
   formatRole
-} from "./ui.js?v=20260730";
+} from "./ui.js?v=20260731-1";
 
 import {
   refreshSessionAndRole
-} from "./auth.js?v=20260730";
+} from "./auth.js?v=20260731-1";
 
 export async function openAdminPanel() {
   if (state.currentRole !== "admin") {
@@ -64,7 +64,7 @@ export async function loadAdminUsers() {
 
   const { data, error } =
     await supabaseClient.rpc(
-      "admin_list_users"
+      "admin_list_access_users"
     );
 
   loading.hidden = true;
@@ -110,12 +110,15 @@ export async function loadAdminUsers() {
     created.className =
       "user-created";
 
+    const isPending =
+      !user.role;
+
     created.textContent =
-      `Joined ${
+      `${isPending ? "Requested access" : "Joined"} ${
         formatDate(
           user.created_at
         ) || "unknown date"
-      }`;
+      }${isPending ? " · Pending approval" : ""}`;
 
     details.append(
       email,
@@ -133,6 +136,18 @@ export async function loadAdminUsers() {
         user.email || "user"
       }`
     );
+
+    if (isPending) {
+      const pendingOption =
+        document.createElement("option");
+
+      pendingOption.value = "";
+      pendingOption.textContent = "Pending approval";
+      pendingOption.selected = true;
+      pendingOption.disabled = true;
+
+      select.appendChild(pendingOption);
+    }
 
     [
       [
@@ -176,6 +191,10 @@ export async function loadAdminUsers() {
         const newRole =
           select.value;
 
+        if (!newRole) {
+          return;
+        }
+
         select.disabled = true;
 
         const {
@@ -201,7 +220,7 @@ export async function loadAdminUsers() {
           );
 
           select.value =
-            previousRole;
+            previousRole || "";
 
           message.textContent =
             updateError.message ||
