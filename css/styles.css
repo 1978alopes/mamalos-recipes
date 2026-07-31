@@ -20,7 +20,7 @@
     }
 
     body {
-      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      font-family: "IBM Plex Serif", serif;
       font-size: 19px;
       background: var(--cream);
       color: var(--ink);
@@ -42,7 +42,7 @@
     header {
       background: linear-gradient(135deg, var(--terracotta) 0%, #d4784a 100%);
       color: white;
-      font-family: "Edu VIC WA NT Hand", cursive;
+      font-family: "IBM Plex Serif", serif;
       padding: 1.75rem 1.5rem 2rem;
       text-align: center;
       box-shadow: 0 4px 24px rgba(196, 92, 38, 0.25);
@@ -70,7 +70,7 @@
 
     header p {
       opacity: 0.92;
-      font-family: "Annie Use Your Telescope", cursive;
+      font-family: "IBM Plex Serif", serif;
       font-size: calc(1.05rem + 3px);
       max-width: 560px;
       margin: 0 auto;
@@ -319,7 +319,7 @@
       border-radius: var(--radius);
       padding: 1.35rem;
       box-shadow: var(--card-shadow);
-      font-family: "Annie Use Your Telescope", cursive;
+      font-family: "IBM Plex Serif", serif;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
       border: 1px solid #f0e4d4;
@@ -354,25 +354,25 @@
 
     .recipe-card h3 {
       font-size: 1.2rem;
-      font-family: "Edu VIC WA NT Hand", cursive;
+      font-family: "IBM Plex Serif", serif;
       font-weight: 500;
       color: var(--terracotta);
       line-height: 1.3;
     }
 
     #viewTitle {
-      font-family: "Edu VIC WA NT Hand", cursive;
+      font-family: "IBM Plex Serif", serif;
       font-weight: 500;
       font-size: 1.45rem;
     }
 
     #formTitle {
-      font-family: "Edu VIC WA NT Hand", cursive;
+      font-family: "IBM Plex Serif", serif;
       font-weight: 500;
     }
 
     #formModal .modal-body {
-      font-family: "Annie Use Your Telescope", cursive;
+      font-family: "IBM Plex Serif", serif;
     }
 
     #viewMeta,
@@ -380,7 +380,7 @@
     #viewInstructions,
     #viewNotes,
     #viewModal .section-label {
-      font-family: "Annie Use Your Telescope", cursive;
+      font-family: "IBM Plex Serif", serif;
     }
 
     .recipe-card .meta {
