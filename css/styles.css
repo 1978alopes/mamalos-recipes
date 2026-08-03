@@ -77,7 +77,7 @@
     }
 
     .container {
-      max-width: 980px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 1.25rem 1.25rem 3rem;
     }
@@ -304,14 +304,9 @@
 
     .recipe-grid {
       display: grid;
-      grid-template-rows: repeat(3, auto);
-      grid-auto-flow: column;
-      grid-auto-columns: 260px;
-      gap: 1.25rem;
-      overflow-x: auto;
-      overscroll-behavior-inline: contain;
-      padding: 0.25rem 0.15rem 1rem;
-      scroll-snap-type: inline proximity;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      padding: 0.25rem 0 1rem;
     }
 
     .recipe-card {
@@ -327,7 +322,10 @@
       flex-direction: column;
       gap: 0.5rem;
       text-align: center;
-      scroll-snap-align: start;
+    }
+
+    .load-more-sentinel {
+      height: 1px;
     }
 
     .recipe-card:hover {
@@ -717,6 +715,20 @@
     @media (min-width: 360px) and (max-width: 620px) {
       .recipe-card {
         padding: 1rem 0.75rem;
+      }
+    }
+
+    @media (min-width: 700px) {
+      .recipe-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+      }
+    }
+
+    @media (min-width: 1050px) {
+      .recipe-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 1.25rem;
       }
     }
 

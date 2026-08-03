@@ -4,7 +4,7 @@ import {
   state,
   canManageRecipes,
   canModifyRecipe
-} from "./state.js?v=20260731-1";
+} from "./state.js?v=20260803-1";
 
 import {
   recipeGrid,
@@ -19,11 +19,15 @@ import {
   setModalOpen,
   formatDate,
   setFormMessage
-} from "./ui.js?v=20260731-1";
+} from "./ui.js?v=20260803-1";
 
-let shouldAnimateCards = true;
 const recipeOrder = new Map();
-const MAX_VISIBLE_RECIPES = 30;
+const loadMoreSentinel =
+  document.getElementById("loadMoreSentinel");
+
+let filteredRecipes = [];
+let renderedRecipeCount = 0;
+let recipeObserver = null;
 
 function randomizeRecipes(recipes) {
   recipes.forEach(recipe => {
@@ -119,7 +123,7 @@ export function renderRecipes() {
   const selectedCategory =
     categoryFilter.value.trim().toLowerCase();
 
-  const filtered =
+  filteredRecipes =
     state.recipes.filter(recipe => {
       const matchesCategory =
         !selectedCategory ||
@@ -147,13 +151,12 @@ export function renderRecipes() {
       return matchesCategory && matchesSearch;
     });
 
-  const visibleRecipes =
-    filtered.slice(0, MAX_VISIBLE_RECIPES);
-
   recipeGrid.innerHTML = "";
+  renderedRecipeCount = 0;
 
-  if (filtered.length === 0) {
+  if (filteredRecipes.length === 0) {
     recipeGrid.hidden = true;
+    loadMoreSentinel.hidden = true;
     emptyState.hidden = false;
 
     const emptyText =
@@ -171,29 +174,62 @@ export function renderRecipes() {
 
   emptyState.hidden = true;
   recipeGrid.hidden = false;
+  loadMoreSentinel.hidden = false;
 
-  visibleRecipes.forEach((recipe, index) => {
+  renderNextRecipeBatch();
+
+  if (!("IntersectionObserver" in window)) {
+    while (renderedRecipeCount < filteredRecipes.length) {
+      renderNextRecipeBatch();
+    }
+  }
+}
+
+function getRecipeBatchSize() {
+  if (window.matchMedia("(min-width: 1050px)").matches) {
+    return 20;
+  }
+
+  if (window.matchMedia("(min-width: 700px)").matches) {
+    return 16;
+  }
+
+  return 8;
+}
+
+function renderNextRecipeBatch() {
+  if (
+    renderedRecipeCount >= filteredRecipes.length
+  ) {
+    loadMoreSentinel.hidden = true;
+    return;
+  }
+
+  const batch =
+    filteredRecipes.slice(
+      renderedRecipeCount,
+      renderedRecipeCount + getRecipeBatchSize()
+    );
+
+  batch.forEach((recipe, index) => {
     const card =
       document.createElement("article");
 
     card.className = "recipe-card";
+    card.classList.add("recipe-card-enter");
+    card.style.setProperty(
+      "--card-index",
+      index
+    );
 
-    if (shouldAnimateCards) {
-      card.classList.add("recipe-card-enter");
-      card.style.setProperty(
-        "--card-index",
-        index
-      );
-
-      card.addEventListener(
-        "animationend",
-        () => {
-          card.classList.remove("recipe-card-enter");
-          card.style.removeProperty("--card-index");
-        },
-        { once: true }
-      );
-    }
+    card.addEventListener(
+      "animationend",
+      () => {
+        card.classList.remove("recipe-card-enter");
+        card.style.removeProperty("--card-index");
+      },
+      { once: true }
+    );
 
     card.tabIndex = 0;
 
@@ -277,7 +313,31 @@ export function renderRecipes() {
     recipeGrid.appendChild(card);
   });
 
-  shouldAnimateCards = false;
+  renderedRecipeCount += batch.length;
+  loadMoreSentinel.hidden =
+    renderedRecipeCount >= filteredRecipes.length;
+}
+
+export function initializeRecipeLoading() {
+  if (
+    recipeObserver ||
+    !("IntersectionObserver" in window)
+  ) {
+    return;
+  }
+
+  recipeObserver = new IntersectionObserver(
+    entries => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        renderNextRecipeBatch();
+      }
+    },
+    {
+      rootMargin: "300px 0px"
+    }
+  );
+
+  recipeObserver.observe(loadMoreSentinel);
 }
 
 export function openView(id) {

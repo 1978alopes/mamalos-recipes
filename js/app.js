@@ -20,7 +20,7 @@ import {
   loadingState,
   closeOnBackdrop,
   setModalOpen
-} from "./ui.js?v=20260731-1";
+} from "./ui.js?v=20260803-1";
 
 import {
   isConfigured,
@@ -33,24 +33,25 @@ import {
   submitAuth,
   signOut,
   listenForAuthChanges
-} from "./auth.js?v=20260731-1";
+} from "./auth.js?v=20260803-1";
 
 import {
   loadRecipes,
   renderRecipes,
+  initializeRecipeLoading,
   openAddForm,
   openEditForm,
   closeView,
   closeForm,
   saveRecipe,
   deleteCurrent
-} from "./recipes.js?v=20260731-1";
+} from "./recipes.js?v=20260803-1";
 
 import {
   openAdminPanel,
   closeAdminPanel,
   loadAdminUsers
-} from "./admin.js?v=20260731-1";
+} from "./admin.js?v=20260803-1";
 
 function bindEvents() {
   addBtn.addEventListener(
@@ -311,6 +312,7 @@ function bindEvents() {
 
 async function init() {
   bindEvents();
+  initializeRecipeLoading();
 
   if (!isConfigured()) {
     loadingState.textContent =

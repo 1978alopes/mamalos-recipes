@@ -1,6 +1,6 @@
 "use strict";
 
-import { state, canManageRecipes } from "./state.js?v=20260731-1";
+import { state, canManageRecipes } from "./state.js?v=20260803-1";
 
 export const recipeGrid = document.getElementById("recipeGrid");
 export const loadingState = document.getElementById("loadingState");

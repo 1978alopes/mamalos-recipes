@@ -1,6 +1,6 @@
 "use strict";
 
-import { state } from "./state.js?v=20260731-1";
+import { state } from "./state.js?v=20260803-1";
 
 import {
   authForm,
@@ -12,7 +12,7 @@ import {
   setAuthMessage,
   setRequestAccessMessage,
   updateAccountUI
-} from "./ui.js?v=20260731-1";
+} from "./ui.js?v=20260803-1";
 
 export function isConfigured() {
   return (
